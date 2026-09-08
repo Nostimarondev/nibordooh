@@ -89,6 +89,7 @@ function initPriceFeed() {
 // ─── Hamburger Menu ───────────────────────────────────────────────────────────
 function initHamburger() {
   const btn         = document.getElementById('hamburger-btn');
+  const closeBtn    = document.getElementById('mobile-menu-close');
   const menu        = document.getElementById('mobile-menu');
   const mobileLinks = menu ? menu.querySelectorAll('.mobile-nav-link') : [];
 
@@ -115,6 +116,9 @@ function initHamburger() {
   };
 
   btn.addEventListener('click', () => isOpen ? closeMenu() : openMenu());
+
+  // Close button inside the overlay
+  if (closeBtn) closeBtn.addEventListener('click', closeMenu);
 
   // Close when a mobile link is clicked and scroll via Lenis
   mobileLinks.forEach(link => {
