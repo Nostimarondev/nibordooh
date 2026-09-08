@@ -1605,11 +1605,12 @@ input[type="range"]::-webkit-slider-runnable-track {
   font-weight: 700;
   line-height: 0.85;
   color: #000;
-  /* Scaled down to fit 9 characters across the viewport without cutting off */
-  font-size: clamp(2rem, 11.2vw, 20rem);
-  letter-spacing: -0.03em;
-  padding: 1rem 0 0.5rem;
+  /* Perfect fit edge-to-edge */
+  font-size: 15.5vw;
+  letter-spacing: -0.04em;
+  padding: 1rem 0 2rem;
   user-select: none;
+  white-space: nowrap;
   /* Tight fit — overflow hidden prevents any side bleed */
   overflow: hidden;
 }
