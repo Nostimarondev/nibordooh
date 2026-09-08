@@ -5,7 +5,6 @@ export default defineConfig({
   plugins: [
     ViteImageOptimizer({
       png: {
-        // Max compression without visible quality loss
         quality: 80,
       },
       jpeg: {
@@ -23,7 +22,7 @@ export default defineConfig({
       svg: {
         multipass: true,
         plugins: [
-          { name: 'preset-default', params: { overrides: { removeViewBox: false } } },
+          'preset-default'
         ],
       },
     }),
@@ -31,13 +30,7 @@ export default defineConfig({
   build: {
     // Split vendor chunks for better caching
     rollupOptions: {
-      output: {
-        manualChunks: {
-          gsap: ['gsap'],
-          lenis: ['lenis'],
-          ogl: ['ogl'],
-        },
-      },
+      output: {},
     },
     // Inline small assets (< 4KB) as base64
     assetsInlineLimit: 4096,
@@ -45,7 +38,5 @@ export default defineConfig({
     sourcemap: false,
     // Target modern browsers
     target: 'es2020',
-    // Minify with esbuild (faster than terser)
-    minify: 'esbuild',
   },
 });
