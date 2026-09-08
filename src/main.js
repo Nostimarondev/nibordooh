@@ -235,39 +235,127 @@ document.addEventListener('DOMContentLoaded', () => {
   // Lore text reveal animation
   const loreItems = document.querySelectorAll('.lore-text-item');
   const loreSideImages = document.querySelectorAll('.lore-side-img');
+  const loreSpinner = document.querySelector('.lore-image-spinner');
+  const loreSection = document.querySelector('#lore');
+  const lorePlaceholder = document.querySelector('.lore-image-placeholder');
 
-  loreItems.forEach((item, index) => {
-    // Text fade in
-    gsap.to(item, {
+  // Disable the CSS float animation on the placeholder so GSAP has full control during entry
+  if (lorePlaceholder) lorePlaceholder.style.animation = 'none';
+
+  // --- 1. ENTRY ANIMATION ---
+  // Image grows in from small/far to full size, finishing exactly when the first text is lit
+  if (lorePlaceholder && loreItems.length > 0) {
+    gsap.from(lorePlaceholder, {
       scrollTrigger: {
-        trigger: item,
-        start: 'top 65%',
+        trigger: loreSection,
+        start: 'top 85%',
+        endTrigger: loreItems[0],
         end: 'top 45%',
-        scrub: true,
-        onEnter: () => {
-          loreSideImages.forEach(img => img.classList.remove('active'));
-          if (loreSideImages[index]) loreSideImages[index].classList.add('active');
-        },
-        onLeaveBack: () => {
-          loreSideImages.forEach(img => img.classList.remove('active'));
-          const prevIndex = index > 0 ? index - 1 : 0;
-          if (loreSideImages[prevIndex]) loreSideImages[prevIndex].classList.add('active');
+        scrub: 1.5,
+        onLeave: () => {
+          // Once entry is done, restore float animation
+          lorePlaceholder.style.animation = '';
         }
       },
+      scale: 0.4,
+      y: 100,
+      opacity: 0,
+      ease: 'power3.out',
+    });
+  }
+
+  // --- 2. TEXT FADE IN / OUT ---
+  loreItems.forEach((item) => {
+    gsap.to(item, {
+      scrollTrigger: { trigger: item, start: 'top 65%', end: 'top 45%', scrub: true },
       opacity: 1,
     });
-
-    // Text fade out
     gsap.to(item, {
-      scrollTrigger: {
-        trigger: item,
-        start: 'bottom 45%',
-        end: 'bottom 25%',
-        scrub: true,
-      },
+      scrollTrigger: { trigger: item, start: 'bottom 45%', end: 'bottom 25%', scrub: true },
       opacity: 0.15,
     });
   });
+
+  // --- 3. SCROLL-DRIVEN 360° SPIN between paragraphs with mid-spin image swap ---
+  // The spin happens in the "gap" between paragraphs: triggered from the bottom of
+  // item[i] to the top of item[i+1]. At 180° (midpoint), the image swaps silently.
+  if (loreSpinner && loreItems.length > 1) {
+    for (let i = 0; i < loreItems.length - 1; i++) {
+      const nextIndex = i + 1;
+      let swapped = false;
+
+      const spinObj = { rotation: 0 };
+
+      gsap.to(spinObj, {
+        rotation: 720, // Two full spins
+        ease: 'none',
+        scrollTrigger: {
+          trigger: loreItems[i],
+          start: 'bottom 50%',
+          endTrigger: loreItems[nextIndex],
+          end: 'top 50%',
+          scrub: 1,
+          onUpdate: (self) => {
+            const progress = self.progress; // 0 to 1
+            const deg = progress * 720;     // 2 full spins
+
+            // Single-hump sine: peaks at 0.5 (360°, right in the middle of the 2 spins)
+            const sineVal = Math.sin(progress * Math.PI);
+
+            // Scale: compresses down to 0.4 at peak squish moments to look like a small ball
+            const squish = 1 - sineVal * 0.6;
+
+            // Blur: up to 12px at peak spin, 0 at start/end
+            const blurPx = sineVal * 12;
+
+            // Apply all transforms to spinner
+            loreSpinner.style.transform = `rotate(${deg}deg) scale(${squish})`;
+            loreSpinner.style.filter = `blur(${blurPx.toFixed(1)}px)`;
+
+            // Apply border-radius to the placeholder (it has overflow:hidden)
+            // We use 50% to make it as circular/pill-shaped as possible
+            if (lorePlaceholder) {
+              lorePlaceholder.style.borderRadius = sineVal < 0.05
+                ? '60px'
+                : `calc(60px - ${(sineVal * 60).toFixed(0)}px + ${(sineVal * 50).toFixed(0)}%)`;
+            }
+
+            // Swap at 0.5 (= 360° exactly between the two spins — peak squish)
+            if (!swapped && progress >= 0.5) {
+              swapped = true;
+              loreSideImages.forEach(img => img.classList.remove('active'));
+              loreSideImages.forEach(img => img.style.transition = 'none');
+              if (loreSideImages[nextIndex]) loreSideImages[nextIndex].classList.add('active');
+              requestAnimationFrame(() => {
+                loreSideImages.forEach(img => img.style.transition = '');
+              });
+            }
+
+            // Reset if scrolling backwards past swap point
+            if (swapped && progress < 0.5) {
+              swapped = false;
+              loreSideImages.forEach(img => img.classList.remove('active'));
+              loreSideImages.forEach(img => img.style.transition = 'none');
+              if (loreSideImages[i]) loreSideImages[i].classList.add('active');
+              requestAnimationFrame(() => {
+                loreSideImages.forEach(img => img.style.transition = '');
+              });
+            }
+          },
+          onLeave: () => {
+            // Fully reset all effects
+            loreSpinner.style.transform = 'rotate(0deg) scale(1)';
+            loreSpinner.style.filter = 'blur(0px)';
+            if (lorePlaceholder) lorePlaceholder.style.borderRadius = '60px';
+          },
+          onEnterBack: () => {
+            swapped = false;
+          }
+        },
+      });
+    }
+  }
+
 
   // Initialize DriftWall background for PFP Maker section
   const wallItems = [
