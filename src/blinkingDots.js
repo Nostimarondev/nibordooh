@@ -6,7 +6,15 @@ export function initBlinkingDots(canvasId) {
 
   // Config
   const DOT_COLOR = [204, 255, 0]; // Lime green
-  const DOT_COUNT = 1580;
+  // Adaptive dot count: reduce on smaller viewports to save CPU
+  const getAdaptiveDotCount = () => {
+    const w = window.innerWidth;
+    if (w < 480) return 400;
+    if (w < 768) return 700;
+    if (w < 1280) return 1100;
+    return 1580;
+  };
+  let DOT_COUNT = getAdaptiveDotCount();
   const MAX_OPACITY = 0.25;  // Subtle - more transparent
   const MIN_OPACITY = 0.02;
   const BLINK_SPEED_MIN = 0.003;
@@ -24,6 +32,7 @@ export function initBlinkingDots(canvasId) {
     height = rect.height;
     canvas.width = width;
     canvas.height = height;
+    DOT_COUNT = getAdaptiveDotCount();
     buildDots();
   };
 

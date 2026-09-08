@@ -4,6 +4,7 @@
   --dark-panel: #111411;
   --border-color: #222622;
   --text-gray: #889288;
+  --hotdog-red: #e63b2e;
 }
 
 * {
@@ -119,6 +120,19 @@ html.lenis body {
   height: 6px;
   background-color: var(--lime);
   border-radius: 50%;
+  animation: livePulse 2s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+@keyframes livePulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(204, 255, 0, 0.6);
+    opacity: 1;
+  }
+  50% {
+    box-shadow: 0 0 0 5px rgba(204, 255, 0, 0);
+    opacity: 0.75;
+  }
 }
 
 .price-symbol {
@@ -171,6 +185,51 @@ html.lenis body {
   display: flex;
   align-items: center;
   gap: 1.5rem;
+}
+
+/* ── Hamburger Button ── */
+.hamburger-btn {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  width: 40px;
+  height: 40px;
+  background: var(--dark-panel);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  cursor: pointer;
+  padding: 0;
+  transition: border-color 0.2s;
+  z-index: 110;
+  position: relative;
+}
+
+.hamburger-btn:hover {
+  border-color: var(--lime);
+}
+
+.hamburger-btn span {
+  display: block;
+  width: 18px;
+  height: 2px;
+  background: #fff;
+  border-radius: 2px;
+  transition: transform 0.3s cubic-bezier(0.23, 1, 0.32, 1), opacity 0.3s ease;
+  transform-origin: center;
+}
+
+/* Hamburger → X animation */
+.hamburger-btn.is-open span:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+.hamburger-btn.is-open span:nth-child(2) {
+  opacity: 0;
+  transform: scaleX(0);
+}
+.hamburger-btn.is-open span:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
 }
 
 .social-icons {
@@ -391,54 +450,6 @@ html.lenis body {
   display: flex;
   justify-content: center;
   align-items: center;
-}
-
-.mascot-container {
-  position: relative;
-  width: 100%;
-  max-width: 420px;
-  aspect-ratio: 1 / 1;
-  /* Removed gradient background just in case the image itself has the green background */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: -40px;
-  animation: floatMascot 4s ease-in-out infinite;
-}
-
-@keyframes floatMascot {
-  0% {
-    transform: translateY(0px);
-  }
-
-  50% {
-    transform: translateY(-15px);
-  }
-
-  100% {
-    transform: translateY(0px);
-  }
-}
-
-.mascot-glow {
-  position: absolute;
-  inset: -20px;
-  background: var(--lime);
-  filter: blur(40px);
-  opacity: 0.3;
-  z-index: 0;
-  border-radius: 50%;
-}
-
-.mascot-img {
-  position: relative;
-  z-index: 1;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 40px;
-  /* Force rounded corners directly on the image */
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
 
 /* Marquee */
@@ -1012,7 +1023,7 @@ input[type="range"]::-webkit-slider-runnable-track {
   width: 100%;
   height: 100%;
   z-index: 0;
-  opacity: 1.8;
+  opacity: 0.8;
 }
 
 .lore-container {
@@ -1093,6 +1104,30 @@ input[type="range"]::-webkit-slider-runnable-track {
   font-weight: 500;
   margin: 0;
   transition: opacity 0.1s ease-out;
+  animation: loreFloat 6s ease-in-out infinite;
+}
+
+/* Stagger float phase per paragraph so they don't move in sync */
+.lore-text-item:nth-child(1) { animation-delay: 0s; }
+.lore-text-item:nth-child(2) { animation-delay: 0.8s; }
+.lore-text-item:nth-child(3) { animation-delay: 1.6s; }
+
+@keyframes loreFloat {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  33% {
+    transform: translateY(-8px) rotate(-0.15deg);
+  }
+  66% {
+    transform: translateY(-4px) rotate(0.1deg);
+  }
+}
+
+/* Lime highlight for key lore terms */
+.lore-highlight {
+  color: var(--lime);
+  font-style: italic;
 }
 
 @media (max-width: 1024px) {
@@ -1143,6 +1178,163 @@ input[type="range"]::-webkit-slider-runnable-track {
   .lore-text-item {
     font-size: 2rem;
   }
+}
+
+/* ── Mobile Nav & Hamburger ── */
+@media (max-width: 768px) {
+  /* Hide desktop nav items */
+  .nav-links {
+    display: none;
+  }
+
+  .social-icons {
+    display: none;
+  }
+
+  .nav-right .btn-primary {
+    display: none;
+  }
+
+  /* Show hamburger */
+  .hamburger-btn {
+    display: flex;
+  }
+
+  /* Price pill: shrink a bit */
+  .price-pill {
+    font-size: 0.7rem;
+    padding: 0.35rem 0.65rem;
+  }
+}
+
+/* Mobile Menu Overlay */
+.mobile-menu {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+  padding: 2rem;
+  background: rgba(5, 5, 5, 0.97);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-bottom: 1px solid var(--border-color);
+
+  /* Hidden by default */
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-20px);
+  transition:
+    opacity 0.35s cubic-bezier(0.23, 1, 0.32, 1),
+    transform 0.35s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.mobile-menu.is-open {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.mobile-nav {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  max-width: 280px;
+}
+
+.mobile-nav-link {
+  display: block;
+  width: 100%;
+  text-align: center;
+  color: var(--text-gray);
+  text-decoration: none;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 1.5rem;
+  padding: 1rem 1.5rem;
+  border-radius: 14px;
+  border: 1px solid transparent;
+  transition: color 0.2s, border-color 0.2s, background 0.2s;
+  letter-spacing: 0.5px;
+}
+
+.mobile-nav-link:hover,
+.mobile-nav-link:focus {
+  color: #fff;
+  border-color: var(--border-color);
+  background: var(--dark-panel);
+}
+
+.mobile-nav-link.active {
+  color: var(--lime);
+  border-color: rgba(204, 255, 0, 0.2);
+  background: rgba(204, 255, 0, 0.05);
+}
+
+.mobile-divider {
+  width: 100%;
+  max-width: 280px;
+  height: 1px;
+  background: var(--border-color);
+}
+
+.mobile-social-row {
+  display: flex;
+  gap: 1.5rem;
+  color: var(--text-gray);
+}
+
+.mobile-social-row .social-icon {
+  color: inherit;
+  transition: color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  background: var(--dark-panel);
+  border: 1px solid var(--border-color);
+  border-radius: 50%;
+}
+
+.mobile-social-row .social-icon:hover {
+  color: #fff;
+  border-color: rgba(255,255,255,0.3);
+}
+
+.mobile-trade-btn {
+  background: var(--lime);
+  color: #000;
+  border: none;
+  padding: 0.9rem 2rem;
+  border-radius: 40px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 900;
+  font-size: 1.1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  transition: opacity 0.2s, transform 0.1s;
+  width: 100%;
+  max-width: 280px;
+  justify-content: center;
+}
+
+.mobile-trade-btn:hover {
+  opacity: 0.9;
+}
+
+.mobile-trade-btn:active {
+  transform: scale(0.97);
 }
 
 
