@@ -11,7 +11,7 @@ export function initPfpMaker() {
   if (!uploadInput || !canvas) return;
 
   const ctx = canvas.getContext('2d');
-  
+
   let userImg = null;
   let maskImg = null;
 
@@ -51,7 +51,7 @@ export function initPfpMaker() {
       ctx.translate(maskX, maskY);
       ctx.rotate((maskRotate * Math.PI) / 180);
       ctx.scale(maskScale, maskScale);
-      
+
       // Center the mask on its coordinates
       ctx.drawImage(maskImg, -maskImg.width / 2, -maskImg.height / 2);
       ctx.restore();
@@ -75,7 +75,7 @@ export function initPfpMaker() {
         // Reset mask position
         maskX = canvas.width / 2;
         maskY = canvas.height / 2;
-        
+
         if (!maskImg) loadMask();
         else draw();
       };
@@ -150,6 +150,8 @@ export function initPfpMaker() {
   }, { passive: false });
   canvas.addEventListener('touchend', onUp);
 
+  const pfpShareBtn = document.getElementById('pfp-share-btn');
+
   // Download
   downloadBtn.addEventListener('click', () => {
     if (!userImg) return;
@@ -158,4 +160,28 @@ export function initPfpMaker() {
     link.href = canvas.toDataURL('image/png');
     link.click();
   });
+
+  // Share on X
+  if (pfpShareBtn) {
+    pfpShareBtn.addEventListener('click', async () => {
+      if (!userImg) return;
+
+      // Try copying canvas to clipboard automatically
+      try {
+        const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+        if (blob) {
+          await navigator.clipboard.write([
+            new ClipboardItem({ 'image/png': blob })
+          ]);
+        }
+      } catch (err) {
+        console.warn('Could not copy to clipboard automatically', err);
+      }
+
+      // Open X with intent
+      const text = encodeURIComponent('¡I just created my Bandit PFP in Nibor Dooh! 🥷🟢\n(Tip: Paste the image you just copied');
+      const xUrl = `https://twitter.com/intent/tweet?text=${text}&url=${encodeURIComponent(window.location.href)}`;
+      window.open(xUrl, '_blank');
+    });
+  }
 }

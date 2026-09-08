@@ -113,9 +113,9 @@ export class DomeGallery {
     this.handleResize();
     this.ro = new ResizeObserver(() => this.handleResize());
     this.ro.observe(this.rootRef);
-    
+
     // Auto-scroll animation initially
-    this.startInertia(0.5, 0); 
+    this.startInertia(0.5, 0);
   }
 
   buildDOM() {
@@ -141,7 +141,7 @@ export class DomeGallery {
       itemEl.dataset.offsetY = it.y;
       itemEl.dataset.sizeX = it.sizeX;
       itemEl.dataset.sizeY = it.sizeY;
-      
+
       itemEl.style.setProperty('--offset-x', it.x);
       itemEl.style.setProperty('--offset-y', it.y);
       itemEl.style.setProperty('--item-size-x', it.sizeX);
@@ -152,7 +152,7 @@ export class DomeGallery {
       imgWrapper.role = 'button';
       imgWrapper.tabIndex = 0;
       imgWrapper.setAttribute('aria-label', it.alt || 'Open image');
-      
+
       const img = document.createElement('img');
       img.src = it.src;
       img.draggable = false;
@@ -188,11 +188,11 @@ export class DomeGallery {
 
     this.viewerRef = document.createElement('div');
     this.viewerRef.className = 'viewer';
-    
+
     this.scrimRef = document.createElement('div');
     this.scrimRef.className = 'scrim';
     this.scrimRef.addEventListener('click', () => this.closeItem());
-    
+
     this.frameRef = document.createElement('div');
     this.frameRef.className = 'frame';
 
@@ -231,7 +231,7 @@ export class DomeGallery {
     const viewerPad = Math.max(8, Math.round(minDim * this.options.padFactor));
     this.rootRef.style.setProperty('--radius', `${this.state.lockedRadius}px`);
     this.rootRef.style.setProperty('--viewer-pad', `${viewerPad}px`);
-    
+
     this.applyTransform(this.state.rotation.x, this.state.rotation.y);
 
     const enlargedOverlay = this.viewerRef.querySelector('.enlarge');
@@ -321,10 +321,10 @@ export class DomeGallery {
 
     const onPointerMove = (e) => {
       if (this.focusedEl || !this.state.dragging || !this.state.startPos) return;
-      
+
       const dxTotal = e.clientX - this.state.startPos.x;
       const dyTotal = e.clientY - this.state.startPos.y;
-      
+
       if (!this.state.moved) {
         const dist2 = dxTotal * dxTotal + dyTotal * dyTotal;
         if (dist2 > 16) this.state.moved = true;
@@ -347,7 +347,7 @@ export class DomeGallery {
         this.options.maxVerticalRotationDeg
       );
       const nextY = wrapAngleSigned(this.state.startRot.y + dxTotal / this.options.dragSensitivity);
-      
+
       if (this.state.rotation.x !== nextX || this.state.rotation.y !== nextY) {
         this.state.rotation = { x: nextX, y: nextY };
         this.applyTransform(nextX, nextY);
@@ -357,14 +357,14 @@ export class DomeGallery {
     const onPointerUp = (e) => {
       if (!this.state.dragging) return;
       this.state.dragging = false;
-      
+
       let vx = clamp(this.state.velocity.x * 2, -1.2, 1.2);
       let vy = clamp(this.state.velocity.y * 2, -1.2, 1.2);
-      
+
       if (Math.abs(vx) > 0.005 || Math.abs(vy) > 0.005) {
         this.startInertia(vx, vy);
       }
-      
+
       if (this.state.moved) this.state.lastDragEndAt = performance.now();
       this.state.moved = false;
     };
@@ -372,7 +372,7 @@ export class DomeGallery {
     this.mainRef.addEventListener('pointerdown', onPointerDown);
     window.addEventListener('pointermove', onPointerMove);
     window.addEventListener('pointerup', onPointerUp);
-    
+
     // Handle Escape key
     window.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') this.closeItem();
@@ -383,7 +383,7 @@ export class DomeGallery {
     if (this.state.dragging || this.state.moved) return;
     if (performance.now() - this.state.lastDragEndAt < 80) return;
     if (this.state.opening) return;
-    
+
     const el = e.currentTarget;
     this.openItem(el);
   }
@@ -393,26 +393,26 @@ export class DomeGallery {
     this.state.opening = true;
     this.state.openStartedAt = performance.now();
     this.lockScroll();
-    
+
     const parent = el.parentElement;
     this.focusedEl = el;
     el.setAttribute('data-focused', 'true');
-    
+
     const offsetX = getDataNumber(parent, 'offsetX', 0);
     const offsetY = getDataNumber(parent, 'offsetY', 0);
     const sizeX = getDataNumber(parent, 'sizeX', 2);
     const sizeY = getDataNumber(parent, 'sizeY', 2);
     const parentRot = computeItemBaseRotation(offsetX, offsetY, sizeX, sizeY, this.options.segments);
-    
+
     const parentY = normalizeAngle(parentRot.rotateY);
     const globalY = normalizeAngle(this.state.rotation.y);
     let rotY = -(parentY + globalY) % 360;
     if (rotY < -180) rotY += 360;
     const rotX = -parentRot.rotateX - this.state.rotation.x;
-    
+
     parent.style.setProperty('--rot-y-delta', `${rotY}deg`);
     parent.style.setProperty('--rot-x-delta', `${rotX}deg`);
-    
+
     const refDiv = document.createElement('div');
     refDiv.className = 'item__image item__image--reference';
     refDiv.style.opacity = '0';
@@ -437,7 +437,7 @@ export class DomeGallery {
     this.originalTilePosition = { left: tileR.left, top: tileR.top, width: tileR.width, height: tileR.height };
     el.style.visibility = 'hidden';
     el.style.zIndex = 0;
-    
+
     const overlay = document.createElement('div');
     overlay.className = 'enlarge';
     overlay.style.position = 'absolute';
@@ -450,21 +450,81 @@ export class DomeGallery {
     overlay.style.willChange = 'transform, opacity';
     overlay.style.transformOrigin = 'top left';
     overlay.style.transition = `transform ${this.options.enlargeTransitionMs}ms ease, opacity ${this.options.enlargeTransitionMs}ms ease`;
-    
+
     const rawSrc = parent.dataset.src || el.querySelector('img')?.src || '';
     const img = document.createElement('img');
     img.src = rawSrc;
     overlay.appendChild(img);
+
+    // Create action buttons container
+    const actionContainer = document.createElement('div');
+    actionContainer.className = 'enlarge-actions';
+    actionContainer.style.opacity = '0';
+    actionContainer.style.transition = 'opacity 0.3s ease';
+
+    // Stop propagation so clicking buttons doesn't close the image (if scrim event bubbles, though scrim is separate, it's good practice)
+    actionContainer.addEventListener('click', (e) => e.stopPropagation());
+
+    const copyBtn = document.createElement('button');
+    copyBtn.className = 'enlarge-btn';
+    copyBtn.innerHTML = `
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+      </svg>
+      <span>Copy image</span>
+    `;
+    copyBtn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      try {
+        const response = await fetch(rawSrc);
+        const blob = await response.blob();
+        await navigator.clipboard.write([
+          new ClipboardItem({ [blob.type]: blob })
+        ]);
+        const span = copyBtn.querySelector('span');
+        const origText = span.textContent;
+        span.textContent = '¡Copiada!';
+        setTimeout(() => { span.textContent = origText; }, 2000);
+      } catch (err) {
+        console.error('Failed to copy', err);
+        const span = copyBtn.querySelector('span');
+        span.textContent = 'Error';
+        setTimeout(() => { span.textContent = 'Copy image'; }, 2000);
+      }
+    });
+
+    const shareBtn = document.createElement('button');
+    shareBtn.className = 'enlarge-btn';
+    shareBtn.innerHTML = `
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+      </svg>
+      <span>Share on X</span>
+    `;
+    shareBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      // Ensure the URL is absolute for Twitter to process it correctly
+      const imgUrl = new URL(rawSrc, window.location.origin).href;
+      const text = encodeURIComponent('¡Check out this Bandit at Nibor Dooh! 🥷🟢\n$DOOH $GME');
+      const xUrl = `https://twitter.com/intent/tweet?text=${text}&url=${encodeURIComponent(imgUrl)}`;
+      window.open(xUrl, '_blank');
+    });
+
+    actionContainer.appendChild(copyBtn);
+    actionContainer.appendChild(shareBtn);
+    overlay.appendChild(actionContainer);
+
     this.viewerRef.appendChild(overlay);
-    
+
     const tx0 = tileR.left - frameR.left;
     const ty0 = tileR.top - frameR.top;
     const sx0 = tileR.width / frameR.width;
     const sy0 = tileR.height / frameR.height;
-    
+
     const validSx0 = isFinite(sx0) && sx0 > 0 ? sx0 : 1;
     const validSy0 = isFinite(sy0) && sy0 > 0 ? sy0 : 1;
-    
+
     overlay.style.transform = `translate(${tx0}px, ${ty0}px) scale(${validSx0}, ${validSy0})`;
 
     setTimeout(() => {
@@ -472,6 +532,11 @@ export class DomeGallery {
       overlay.style.opacity = '1';
       overlay.style.transform = 'translate(0px, 0px) scale(1, 1)';
       this.rootRef.setAttribute('data-enlarging', 'true');
+
+      // Fade in actions after image finishes animating
+      setTimeout(() => {
+        actionContainer.style.opacity = '1';
+      }, this.options.enlargeTransitionMs);
     }, 16);
   }
 
@@ -479,14 +544,14 @@ export class DomeGallery {
     if (performance.now() - this.state.openStartedAt < 250) return;
     const el = this.focusedEl;
     if (!el) return;
-    
+
     const parent = el.parentElement;
     const overlay = this.viewerRef.querySelector('.enlarge');
     if (!overlay) return;
-    
+
     const refDiv = parent.querySelector('.item__image--reference');
     const originalPos = this.originalTilePosition;
-    
+
     if (!originalPos) {
       overlay.remove();
       if (refDiv) refDiv.remove();
@@ -500,41 +565,41 @@ export class DomeGallery {
       this.unlockScroll();
       return;
     }
-    
+
     const currentRect = overlay.getBoundingClientRect();
     const rootRect = this.rootRef.getBoundingClientRect();
-    
+
     const originalPosRelativeToRoot = {
       left: originalPos.left - rootRect.left,
       top: originalPos.top - rootRect.top,
       width: originalPos.width,
       height: originalPos.height
     };
-    
+
     const overlayRelativeToRoot = {
       left: currentRect.left - rootRect.left,
       top: currentRect.top - rootRect.top,
       width: currentRect.width,
       height: currentRect.height
     };
-    
+
     const animatingOverlay = document.createElement('div');
     animatingOverlay.className = 'enlarge-closing';
     animatingOverlay.style.cssText = `position:absolute;left:${overlayRelativeToRoot.left}px;top:${overlayRelativeToRoot.top}px;width:${overlayRelativeToRoot.width}px;height:${overlayRelativeToRoot.height}px;z-index:9999;border-radius: var(--enlarge-radius, 32px);overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.35);transition:all ${this.options.enlargeTransitionMs}ms ease-out;pointer-events:none;margin:0;transform:none;`;
-    
+
     const originalImg = overlay.querySelector('img');
     if (originalImg) {
       const img = originalImg.cloneNode();
       img.style.cssText = 'width:100%;height:100%;object-fit:cover;';
       animatingOverlay.appendChild(img);
     }
-    
+
     overlay.remove();
     this.rootRef.appendChild(animatingOverlay);
-    
+
     // Force layout
     void animatingOverlay.getBoundingClientRect();
-    
+
     requestAnimationFrame(() => {
       animatingOverlay.style.left = originalPosRelativeToRoot.left + 'px';
       animatingOverlay.style.top = originalPosRelativeToRoot.top + 'px';
@@ -542,7 +607,7 @@ export class DomeGallery {
       animatingOverlay.style.height = originalPosRelativeToRoot.height + 'px';
       animatingOverlay.style.opacity = '0';
     });
-    
+
     const cleanup = () => {
       animatingOverlay.remove();
       this.originalTilePosition = null;
@@ -551,21 +616,21 @@ export class DomeGallery {
       el.style.transition = 'none';
       parent.style.setProperty('--rot-y-delta', '0deg');
       parent.style.setProperty('--rot-x-delta', '0deg');
-      
+
       requestAnimationFrame(() => {
         el.style.visibility = '';
         el.style.opacity = '0';
         el.style.zIndex = 0;
         this.focusedEl = null;
         this.rootRef.removeAttribute('data-enlarging');
-        
+
         requestAnimationFrame(() => {
           parent.style.transition = '';
           el.style.transition = 'opacity 300ms ease-out';
-          
+
           requestAnimationFrame(() => {
             el.style.opacity = '1';
-            
+
             setTimeout(() => {
               el.style.transition = '';
               el.style.opacity = '';
@@ -580,7 +645,7 @@ export class DomeGallery {
         });
       });
     };
-    
+
     animatingOverlay.addEventListener('transitionend', cleanup, { once: true });
   }
 
