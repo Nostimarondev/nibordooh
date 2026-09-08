@@ -295,7 +295,8 @@ html.lenis body {
   display: flex;
   align-items: center;
   position: relative;
-  overflow: hidden; /* Prevents hero-bg scale(1.15) from creating horizontal scroll */
+  overflow: hidden;
+  /* Prevents hero-bg scale(1.15) from creating horizontal scroll */
 }
 
 .hero-bg {
@@ -1243,9 +1244,11 @@ input[type="range"]::-webkit-slider-runnable-track {
   /* ── HERO mobile ── */
   .hero {
     min-height: 100vh;
-    padding-top: 0;  /* centrado vertical lo maneja align-items */
+    padding-top: 0;
+    /* centrado vertical lo maneja align-items */
     align-items: center;
-    padding-bottom: 5rem; /* espacio para el marquee */
+    padding-bottom: 5rem;
+    /* espacio para el marquee */
   }
 
   .hero-content {
@@ -1296,7 +1299,8 @@ input[type="range"]::-webkit-slider-runnable-track {
   /* ── TOKENOMICS mobile ── */
   .how-section {
     padding: 5rem 1.25rem;
-    overflow: hidden; /* Prevent any child from creating horizontal scroll */
+    overflow: hidden;
+    /* Prevent any child from creating horizontal scroll */
   }
 
   .how-container .split-layout {
@@ -1437,6 +1441,204 @@ input[type="range"]::-webkit-slider-runnable-track {
   }
 }
 
+/* ── Footer ── */
+.site-footer {
+  background-color: var(--lime);
+  color: #000;
+}
+
+.footer-top {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 5rem 2rem 4rem;
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  gap: 4rem;
+  align-items: flex-start;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.068);
+}
+
+/* Brand column */
+.footer-brand {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.footer-logo-link {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+}
+
+.footer-logo-img {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  object-fit: contain;
+}
+
+.footer-logo-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.footer-logo-title {
+  color: #000;
+  font-weight: 900;
+  font-size: 0.95rem;
+  line-height: 1.2;
+  letter-spacing: 1px;
+}
+
+.footer-logo-sub {
+  color: rgb(0, 0, 0);
+  font-size: 0.6rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.footer-tagline {
+  color: rgb(0, 0, 0);
+  font-size: 0.9rem;
+  line-height: 1.7;
+  max-width: 280px;
+}
+
+.footer-socials {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.footer-social-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  color: #000;
+  text-decoration: none;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.footer-social-icon:hover {
+  background: rgba(0, 0, 0, 0.18);
+  border-color: rgba(0, 0, 0, 0.4);
+}
+
+/* Link columns */
+.footer-links {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+}
+
+.footer-col-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 1200;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: rgb(0, 0, 0);
+  margin-bottom: 1.25rem;
+}
+
+.footer-col-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.footer-link {
+  color: rgb(0, 0, 0);
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.footer-link:hover {
+  color: #000;
+}
+
+/* Bottom lime block — legal text + wordmark */
+.footer-lime-block {
+  background-color: var(--lime);
+  overflow: hidden;
+}
+
+.footer-lime-inner {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem 2rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 2rem;
+  flex-wrap: wrap;
+  border-top: 1px solid rgba(0, 0, 0, 0.15);
+}
+
+.footer-lime-inner .footer-legal {
+  color: rgba(0, 0, 0, 0.65);
+  max-width: 600px;
+}
+
+.footer-lime-inner .footer-copy {
+  color: rgba(0, 0, 0, 0.55);
+  white-space: nowrap;
+}
+
+/* Giant wordmark */
+.footer-wordmark {
+  display: block;
+  width: 100%;
+  text-align: center;
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  line-height: 0.85;
+  color: #000;
+  /* Scaled down to fit 9 characters across the viewport without cutting off */
+  font-size: clamp(2rem, 11.2vw, 20rem);
+  letter-spacing: -0.03em;
+  padding: 1rem 0 0.5rem;
+  user-select: none;
+  /* Tight fit — overflow hidden prevents any side bleed */
+  overflow: hidden;
+}
+
+/* Footer responsive */
+@media (max-width: 768px) {
+  .footer-top {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+    padding: 3rem 1.5rem 2.5rem;
+  }
+
+  .footer-links {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+  }
+
+  .footer-lime-inner {
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 1.25rem 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .footer-links {
+    grid-template-columns: 1fr 1fr;
+  }
+}
 
 /* Mobile Menu Overlay */
 .mobile-menu {
